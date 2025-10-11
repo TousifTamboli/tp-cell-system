@@ -1,0 +1,88 @@
+# =========================================================
+# Root-level .gitignore for:
+# Frontend (Vite + React)
+# Backend (Node/Express)
+# AdminPanel (Vite or other frontend)
+# =========================================================
+
+# ------------------------------
+# Node & Dependency folders
+# ------------------------------
+node_modules/
+**/node_modules/
+
+# ------------------------------
+# Build outputs
+# ------------------------------
+dist/
+build/
+**/dist/
+**/build/
+**/.vite/
+
+# ------------------------------
+# Logs
+# ------------------------------
+logs/
+**/logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+bun-debug.log*
+
+# ------------------------------
+# Environment variables
+# ------------------------------
+.env
+.env.*
+**/.env
+**/.env.*
+
+# ------------------------------
+# Editor & OS junk
+# ------------------------------
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+
+# ------------------------------
+# Cache / Temporary files
+# ------------------------------
+.cache/
+**/.cache/
+tmp/
+temp/
+**/tmp/
+**/temp/
+*.tsbuildinfo
+
+# ------------------------------
+# Test coverage
+# ------------------------------
+coverage/
+**/coverage/
+.vitest/
+**/.vitest/
+
+# ------------------------------
+# Storybook (if used)
+# ------------------------------
+storybook-static/
+**/storybook-static/
+
+# ------------------------------
+# Docker (optional)
+# ------------------------------
+docker-compose.override.yml
+
+# ------------------------------
+# Misc
+# ------------------------------
+*.local
