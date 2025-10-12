@@ -5,17 +5,17 @@
 
 /* 🌐 Common input + button styling */
 .input {
-  @apply w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition;
+  @apply w-full border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition;
 }
 
 .btn-primary {
-  @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition;
+  @apply bg-blue-500 hover:bg-blue-700 text-white font-medium py-2 px-4 transition;
 }
 
 .btn-success {
-  @apply bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition;
+  @apply bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 transition;
 }
 
 .btn-danger {
-  @apply bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-md transition;
+  @apply bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 transition;
 }

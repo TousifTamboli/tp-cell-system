@@ -35,7 +35,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="bg-white shadow-md border rounded-lg max-w-4xl w-full grid md:grid-cols-2 gap-6 p-6">
+      <div className="bg-white shadow-md border max-w-4xl w-full grid md:grid-cols-2 gap-6 p-6">
         {/* Left Side - Login Form */}
         <div>
           <h2 className="text-2xl font-semibold text-blue-800 mb-4 border-b pb-2">
@@ -65,7 +65,7 @@ const Login = () => {
 
             <div className="flex justify-between">
               <button type="submit" className="btn-success">
-                Login Here
+                Login
               </button>
               <button
                 type="button"
@@ -79,7 +79,7 @@ const Login = () => {
         </div>
 
         {/* Right Side - Instructions */}
-        <div className="bg-gray-100 border rounded-lg p-4">
+        <div className="bg-gray-100 border p-4">
           <h3 className="text-lg font-semibold text-orange-600 mb-2">
             Instructions
           </h3>

@@ -43,10 +43,10 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="bg-white shadow-md rounded-xl p-8 w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center mb-6 text-blue-700">
-          Student Registration
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="bg-white shadow-md p-8 w-full max-w-md">
+        <h2 className="text-2xl font-semibold text-center mb-6 text-blue-700">
+          Registration
         </h2>
 
         <form className="space-y-3" onSubmit={handleSubmit}>
@@ -80,7 +80,7 @@ const Register = () => {
             <option value="4th">4th Year</option>
           </select>
 
-          <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+          <button type="submit" className="w-full bg-blue-500 text-white py-2 hover:bg-blue-600">
             Register
           </button>
         </form>
