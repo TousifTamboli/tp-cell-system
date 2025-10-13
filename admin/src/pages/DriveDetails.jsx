@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { SPECIALIZATIONS, BRANCHES, YEARS } from "../config/constants";
 
 const DriveDetails = () => {
   const navigate = useNavigate();
@@ -7,47 +8,108 @@ const DriveDetails = () => {
   const [drive, setDrive] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [filterStatus, setFilterStatus] = useState("All");
+  
+  const [filters, setFilters] = useState({
+    status: "All",
+    specialization: "All",
+    branch: "All",
+    year: "All",
+  });
 
   useEffect(() => {
-    const fetchDrive = async () => {
-      try {
-        const token = localStorage.getItem("adminToken");
-
-        if (!token) {
-          navigate("/admin/login");
-          return;
-        }
-
-        const res = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/placement/admin/drive/${driveId}`,
-          {
-            method: "GET",
-            headers: {
-              "Authorization": `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        if (res.ok) {
-          const data = await res.json();
-          setDrive(data);
-        } else if (res.status === 401 || res.status === 403) {
-          navigate("/admin/login");
-        } else {
-          setError("Failed to load drive details");
-        }
-      } catch (err) {
-        console.error(err);
-        setError("Error loading drive details");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchDrive();
   }, [driveId, navigate]);
+
+  const fetchDrive = async () => {
+    try {
+      const token = localStorage.getItem("adminToken");
+
+      if (!token) {
+        navigate("/admin/login");
+        return;
+      }
+
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/placement/admin/drive/${driveId}`,
+        {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (res.ok) {
+        const data = await res.json();
+        setDrive(data);
+      } else if (res.status === 401 || res.status === 403) {
+        navigate("/admin/login");
+      } else {
+        setError("Failed to load drive details");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Error loading drive details");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Get unique values for filter dropdowns
+  const getUniqueValues = (key) => {
+    if (!drive || !drive.registrations) return [];
+    const values = [...new Set(drive.registrations.map((reg) => reg[key]))].filter(Boolean).sort();
+    return values;
+  };
+
+  const branches = getUniqueValues("userBranch");
+  const years = getUniqueValues("userYear");
+  const statuses = drive?.statuses || [];
+
+  // Apply filters
+  const filteredRegistrations = drive
+    ? drive.registrations.filter((reg) => {
+        const statusMatch = filters.status === "All" || reg.status === filters.status;
+        const specializationMatch = filters.specialization === "All" || reg.userSpecialization === filters.specialization;
+        const branchMatch = filters.branch === "All" || reg.userBranch === filters.branch;
+        const yearMatch = filters.year === "All" || reg.userYear === filters.year;
+
+        return statusMatch && specializationMatch && branchMatch && yearMatch;
+      })
+    : [];
+
+  // Get filter statistics
+  const getFilterStats = () => {
+    const stats = {
+      status: {},
+      specialization: {},
+      branch: {},
+      year: {},
+    };
+
+    drive?.registrations.forEach((reg) => {
+      stats.status[reg.status] = (stats.status[reg.status] || 0) + 1;
+      stats.specialization[reg.userSpecialization] = (stats.specialization[reg.userSpecialization] || 0) + 1;
+      stats.branch[reg.userBranch] = (stats.branch[reg.userBranch] || 0) + 1;
+      stats.year[reg.userYear] = (stats.year[reg.userYear] || 0) + 1;
+    });
+
+    return stats;
+  };
+
+  const stats = getFilterStats();
+
+  const getStatusColor = (status) => {
+    const colors = {
+      "Registration Done": "bg-blue-100 text-blue-800",
+      "Test Given": "bg-purple-100 text-purple-800",
+      "Interview": "bg-amber-100 text-amber-800",
+      "Selected": "bg-green-100 text-green-800",
+      "Rejected": "bg-red-100 text-red-800",
+    };
+    return colors[status] || "bg-gray-100 text-gray-800";
+  };
 
   if (loading) {
     return (
@@ -72,22 +134,6 @@ const DriveDetails = () => {
       </div>
     );
   }
-
-  const filteredRegistrations =
-    filterStatus === "All"
-      ? drive.registrations
-      : drive.registrations.filter((reg) => reg.status === filterStatus);
-
-  const getStatusColor = (status) => {
-    const colors = {
-      "Registration Done": "bg-blue-100 text-blue-800",
-      "Test Given": "bg-purple-100 text-purple-800",
-      "Interview": "bg-amber-100 text-amber-800",
-      "Selected": "bg-green-100 text-green-800",
-      "Rejected": "bg-red-100 text-red-800",
-    };
-    return colors[status] || "bg-gray-100 text-gray-800";
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -139,41 +185,110 @@ const DriveDetails = () => {
           </div>
         </div>
 
-        {/* Filter by Status */}
+        {/* Filters Section */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <p className="text-sm font-semibold text-gray-700 mb-3">
-            Filter by Status:
-          </p>
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setFilterStatus("All")}
-              className={`px-4 py-2 rounded-lg font-semibold transition ${
-                filterStatus === "All"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-              }`}
-            >
-              All ({drive.registrations.length})
-            </button>
-            {drive.statuses.map((status) => {
-              const count = drive.registrations.filter(
-                (reg) => reg.status === status
-              ).length;
-              return (
-                <button
-                  key={status}
-                  onClick={() => setFilterStatus(status)}
-                  className={`px-4 py-2 rounded-lg font-semibold transition ${
-                    filterStatus === status
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                  }`}
-                >
-                  {status} ({count})
-                </button>
-              );
-            })}
+          <h2 className="text-lg font-bold text-slate-800 mb-4">Filter Registrations</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+            {/* Status Filter */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Status
+              </label>
+              <select
+                value={filters.status}
+                onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="All">All ({drive.registrations.length})</option>
+                {statuses.map((status) => (
+                  <option key={status} value={status}>
+                    {status} ({stats.status[status] || 0})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Specialization Filter */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Specialization
+              </label>
+              <select
+                value={filters.specialization}
+                onChange={(e) => setFilters({ ...filters, specialization: e.target.value })}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="All">All ({drive.registrations.length})</option>
+                {SPECIALIZATIONS.map((spec) => (
+                  <option key={spec} value={spec}>
+                    {spec} ({stats.specialization[spec] || 0})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Branch Filter */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Branch/Department
+              </label>
+              <select
+                value={filters.branch}
+                onChange={(e) => setFilters({ ...filters, branch: e.target.value })}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="All">All ({drive.registrations.length})</option>
+                {branches.map((branch) => (
+                  <option key={branch} value={branch}>
+                    {branch} ({stats.branch[branch] || 0})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Year Filter */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Current Year
+              </label>
+              <select
+                value={filters.year}
+                onChange={(e) => setFilters({ ...filters, year: e.target.value })}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="All">All ({drive.registrations.length})</option>
+                {years.map((year) => (
+                  <option key={year} value={year}>
+                    {year} ({stats.year[year] || 0})
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
+
+          {/* Reset Filters Button */}
+          <button
+            onClick={() =>
+              setFilters({
+                status: "All",
+                specialization: "All",
+                branch: "All",
+                year: "All",
+              })
+            }
+            className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition"
+          >
+            Reset Filters
+          </button>
+        </div>
+
+        {/* Results Summary */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <p className="text-sm text-blue-800">
+            Showing <span className="font-bold">{filteredRegistrations.length}</span> of{" "}
+            <span className="font-bold">{drive.registrations.length}</span> registrations
+          </p>
         </div>
 
         {/* Registrations Table */}
@@ -211,10 +326,7 @@ const DriveDetails = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {filteredRegistrations.map((reg, index) => (
-                    <tr
-                      key={reg._id}
-                      className="hover:bg-gray-50 transition"
-                    >
+                    <tr key={reg._id} className="hover:bg-gray-50 transition">
                       <td className="px-6 py-4 text-sm text-slate-800">
                         {index + 1}
                       </td>
@@ -257,7 +369,7 @@ const DriveDetails = () => {
           ) : (
             <div className="text-center py-12">
               <p className="text-gray-600 text-lg">
-                No students registered with this status yet
+                No registrations match the selected filters
               </p>
             </div>
           )}

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { SPECIALIZATIONS } from "../config/constants";
+import { SPECIALIZATIONS, BRANCHES, YEARS, COLLEGES } from "../config/constants";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -209,9 +209,11 @@ const Register = () => {
             required
           >
             <option value="">Select College</option>
-            <option value="GHRCEM">
-              GH Raisoni College of Engineering and Management
-            </option>
+            {COLLEGES.map((college) => (
+              <option key={college} value={college}>
+                {college}
+              </option>
+            ))}
           </select>
 
           <select
@@ -229,14 +231,20 @@ const Register = () => {
             ))}
           </select>
 
-          <input
+          <select
             name="branch"
-            placeholder="Branch/Department"
             value={formData.branch}
             onChange={handleChange}
             className="input"
             required
-          />
+          >
+            <option value="">Branch/Department</option>
+            {BRANCHES.map((branch) => (
+              <option key={branch} value={branch}>
+                {branch}
+              </option>
+            ))}
+          </select>
 
           <select
             name="year"
@@ -246,10 +254,11 @@ const Register = () => {
             required
           >
             <option value="">Current Year</option>
-            <option value="1st">1st Year</option>
-            <option value="2nd">2nd Year</option>
-            <option value="3rd">3rd Year</option>
-            <option value="4th">4th Year</option>
+            {YEARS.map((y) => (
+              <option key={y} value={y}>
+                {y} Year
+              </option>
+            ))}
           </select>
 
           <button

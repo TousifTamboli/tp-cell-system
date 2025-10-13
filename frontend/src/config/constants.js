@@ -12,6 +12,7 @@ export const BRANCHES = [
   "AIML",
   "CSE",
   "IT",
+  "Data Science",
   "Mechanical",
   "Electrical",
   "Civil"
@@ -25,5 +26,5 @@ export const YEARS = [
 ];
 
 export const COLLEGES = [
-  "GHRCEM"
+  "G H Raisoni College of Engineeing and Management Pune"
 ];
