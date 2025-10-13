@@ -239,11 +239,14 @@ const DriveDetails = () => {
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="All">All ({drive.registrations.length})</option>
-                {branches.map((branch) => (
-                  <option key={branch} value={branch}>
-                    {branch} ({stats.branch[branch] || 0})
-                  </option>
-                ))}
+                {BRANCHES.map((branch) => {
+                  const count = drive.registrations.filter((reg) => reg.userBranch === branch).length;
+                  return count > 0 ? (
+                    <option key={branch} value={branch}>
+                      {branch} ({count})
+                    </option>
+                  ) : null;
+                })}
               </select>
             </div>
 
@@ -258,11 +261,14 @@ const DriveDetails = () => {
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="All">All ({drive.registrations.length})</option>
-                {years.map((year) => (
-                  <option key={year} value={year}>
-                    {year} ({stats.year[year] || 0})
-                  </option>
-                ))}
+                {YEARS.map((year) => {
+                  const count = drive.registrations.filter((reg) => reg.userYear === year).length;
+                  return count > 0 ? (
+                    <option key={year} value={year}>
+                      {year} ({count})
+                    </option>
+                  ) : null;
+                })}
               </select>
             </div>
           </div>
