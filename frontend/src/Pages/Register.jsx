@@ -223,6 +223,7 @@ const Register = () => {
             <option value="">Current Specialization</option>
             <option value="B.Tech">B.Tech</option>
             <option value="B.Sc">B.Sc</option>
+            <option value="B.Sc">M.Sc</option>
             <option value="M.Tech">M.Tech</option>
           </select>
 

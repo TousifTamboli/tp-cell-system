@@ -27,8 +27,11 @@ const AdminLogin = () => {
       if (res.ok) {
         localStorage.setItem("adminToken", data.token);
         localStorage.setItem("admin", JSON.stringify(data.admin));
-        alert("Login successful!");
-        navigate("/admin/dashboard");
+        
+        // Force redirect after a small delay to ensure storage is complete
+        setTimeout(() => {
+          navigate("/admin/dashboard", { replace: true });
+        }, 100);
       } else {
         setError(data.message || "Invalid password!");
       }
@@ -81,18 +84,6 @@ const AdminLogin = () => {
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
-
-        <div className="mt-6 pt-6 border-t border-slate-200">
-          <p className="text-center text-sm text-slate-600">
-            Student Portal?{" "}
-            <a
-              href="/login"
-              className="text-blue-600 hover:text-blue-700 font-semibold"
-            >
-              Login as Student
-            </a>
-          </p>
-        </div>
       </div>
     </div>
   );
