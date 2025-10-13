@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { SPECIALIZATIONS } from "../config/constants";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -221,10 +222,11 @@ const Register = () => {
             required
           >
             <option value="">Current Specialization</option>
-            <option value="B.Tech">B.Tech</option>
-            <option value="B.Sc">B.Sc</option>
-            <option value="B.Sc">M.Sc</option>
-            <option value="M.Tech">M.Tech</option>
+            {SPECIALIZATIONS.map((spec) => (
+              <option key={spec} value={spec}>
+                {spec}
+              </option>
+            ))}
           </select>
 
           <input

@@ -8,6 +8,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("current");
+  const [selectedStatuses, setSelectedStatuses] = useState({}); // Track selected statuses
 
   useEffect(() => {
     const fetchData = async () => {

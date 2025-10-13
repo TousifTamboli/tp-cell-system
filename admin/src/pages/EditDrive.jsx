@@ -1,6 +1,6 @@
-// admin/src/pages/EditDrive.jsx
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { SPECIALIZATIONS } from "../config/constants";
 
 const EditDrive = () => {
   const { driveId } = useParams();
@@ -18,9 +18,6 @@ const EditDrive = () => {
   });
 
   const [newStatus, setNewStatus] = useState("");
-
-  // Predefined course options
-  const courseOptions = ["B.Tech", "B.Sc", "M.Tech", "MBA", "MCA"];
 
   useEffect(() => {
     fetchDriveDetails();
@@ -244,7 +241,7 @@ const EditDrive = () => {
                 Eligible Courses * (Select at least one)
               </label>
               <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
-                {courseOptions.map((course) => (
+                {SPECIALIZATIONS.map((course) => (
                   <label
                     key={course}
                     className={`cursor-pointer px-4 py-2 rounded-lg border-2 text-center transition ${
@@ -357,7 +354,7 @@ const EditDrive = () => {
 
           {/* Info Box */}
           <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h3 className="font-semibold text-blue-900 mb-2">ℹ️ Important Notes:</h3>
+            <h3 className="font-semibold text-blue-900 mb-2">Important Notes:</h3>
             <ul className="text-sm text-blue-800 space-y-1 list-disc ml-5">
               <li>Changes will be immediately visible to eligible students</li>
               <li>Existing student registrations will NOT be affected</li>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { SPECIALIZATIONS } from "../config/constants";
 
 const CreateDrive = () => {
   const navigate = useNavigate();
@@ -12,8 +13,6 @@ const CreateDrive = () => {
   const [statusInput, setStatusInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  const courseOptions = ["B.Tech", "B.Sc", "M.Tech"];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -175,7 +174,7 @@ const CreateDrive = () => {
                 Eligible Courses
               </label>
               <div className="space-y-2">
-                {courseOptions.map((course) => (
+                {SPECIALIZATIONS.map((course) => (
                   <label
                     key={course}
                     className="flex items-center p-3 border border-slate-300 rounded-lg cursor-pointer hover:bg-gray-50 transition"
