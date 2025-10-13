@@ -17,7 +17,7 @@ const Profile = () => {
           return;
         }
 
-        const res = await fetch("http://localhost:5000/api/auth/profile", {
+          const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/profile`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
