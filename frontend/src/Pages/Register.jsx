@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { SPECIALIZATIONS, BRANCHES, YEARS, COLLEGES } from "../config/constants";
+import { SPECIALIZATIONS, BRANCHES, YEARS, COLLEGES, PASSOUT_YEARS } from "../config/constants";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -16,6 +16,7 @@ const Register = () => {
     specialization: "",
     branch: "",
     year: "",
+    passoutYear: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -38,7 +39,8 @@ const Register = () => {
       !formData.collegeName ||
       !formData.specialization ||
       !formData.branch ||
-      !formData.year
+      !formData.year ||
+      !formData.passoutYear
     ) {
       setError("All fields are required");
       return false;
@@ -84,7 +86,7 @@ const Register = () => {
     setLoading(true);
 
     try {
-        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/register`, {
+      const res = await fetch("http://localhost:5000/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -257,6 +259,21 @@ const Register = () => {
             {YEARS.map((y) => (
               <option key={y} value={y}>
                 {y} Year
+              </option>
+            ))}
+          </select>
+
+          <select
+            name="passoutYear"
+            value={formData.passoutYear}
+            onChange={handleChange}
+            className="input"
+            required
+          >
+            <option value="">Expected Passout Year</option>
+            {PASSOUT_YEARS.map((year) => (
+              <option key={year} value={year}>
+                {year}
               </option>
             ))}
           </select>

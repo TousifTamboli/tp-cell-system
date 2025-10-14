@@ -21,6 +21,11 @@ const placementDriveSchema = new mongoose.Schema({
     required: true,
     default: [],
   },
+  eligiblePassoutYears: {
+    type: [String],
+    required: true,
+    default: [],
+  },
   registrations: [
     {
       userId: {
@@ -32,6 +37,7 @@ const placementDriveSchema = new mongoose.Schema({
       userSpecialization: String,
       userBranch: String,
       userYear: String,
+      userPassoutYear: String,
       status: String,
       timestamp: {
         type: Date,

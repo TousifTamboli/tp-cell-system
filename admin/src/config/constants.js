@@ -4,15 +4,14 @@
 export const SPECIALIZATIONS = [
   "B.Tech",
   "B.Sc",
-  "M.Sc",
   "M.Tech"
 ];
 
 export const BRANCHES = [
+  "DS",
   "AIML",
   "CSE",
   "IT",
-  "Data Science",
   "Mechanical",
   "Electrical",
   "Civil"
@@ -25,6 +24,18 @@ export const YEARS = [
   "4th"
 ];
 
+export const PASSOUT_YEARS = [
+  "2022",
+  "2023",
+  "2024",
+  "2025",
+  "2026",
+  "2027",
+  "2028",
+  "2029",
+  "2030"
+];
+
 export const COLLEGES = [
-  "G H Raisoni College of Engineeing and Management Pune"
+  "GHRCEM"
 ];

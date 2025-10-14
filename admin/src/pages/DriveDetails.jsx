@@ -314,6 +314,12 @@ const DriveDetails = () => {
                       Email
                     </th>
                     <th className="px-6 py-3 text-left text-sm font-semibold">
+                      Reg Number
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold">
+                      Mobile
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold">
                       Specialization
                     </th>
                     <th className="px-6 py-3 text-left text-sm font-semibold">
@@ -321,6 +327,9 @@ const DriveDetails = () => {
                     </th>
                     <th className="px-6 py-3 text-left text-sm font-semibold">
                       Year
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold">
+                      Passout Year
                     </th>
                     <th className="px-6 py-3 text-left text-sm font-semibold">
                       Status

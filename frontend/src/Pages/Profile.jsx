@@ -17,7 +17,7 @@ const Profile = () => {
           return;
         }
 
-          const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/profile`, {
+        const res = await fetch("http://localhost:5000/api/auth/profile", {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -148,6 +148,16 @@ const Profile = () => {
             <div className="bg-gray-50 p-4 rounded-lg">
               <p className="text-sm font-semibold text-gray-600 mb-1">Current Year</p>
               <p className="text-lg text-gray-800">{user.year}</p>
+            </div>
+
+            <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-600">
+              <p className="text-sm font-semibold text-gray-600 mb-1">Current Year</p>
+              <p className="text-lg text-gray-800">{user.year}</p>
+            </div>
+
+            <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-600">
+              <p className="text-sm font-semibold text-gray-600 mb-1">Expected Passout Year</p>
+              <p className="text-lg text-gray-800">{user.passoutYear}</p>
             </div>
 
             <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-600">

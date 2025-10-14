@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { SPECIALIZATIONS } from "../config/constants";
+import { SPECIALIZATIONS, PASSOUT_YEARS } from "../config/constants";
 
 const CreateDrive = () => {
   const navigate = useNavigate();
@@ -8,6 +8,7 @@ const CreateDrive = () => {
     companyName: "",
     deadline: "",
     eligibleCourses: [],
+    eligiblePassoutYears: [],
     statuses: [],
   });
   const [statusInput, setStatusInput] = useState("");
@@ -26,6 +27,15 @@ const CreateDrive = () => {
       eligibleCourses: prev.eligibleCourses.includes(course)
         ? prev.eligibleCourses.filter((c) => c !== course)
         : [...prev.eligibleCourses, course],
+    }));
+  };
+
+  const handlePassoutYearToggle = (year) => {
+    setFormData((prev) => ({
+      ...prev,
+      eligiblePassoutYears: prev.eligiblePassoutYears.includes(year)
+        ? prev.eligiblePassoutYears.filter((y) => y !== year)
+        : [...prev.eligiblePassoutYears, year],
     }));
   };
 
@@ -72,6 +82,11 @@ const CreateDrive = () => {
 
     if (formData.eligibleCourses.length === 0) {
       setError("Please select at least one eligible course");
+      return;
+    }
+
+    if (formData.eligiblePassoutYears.length === 0) {
+      setError("Please select at least one eligible passout year");
       return;
     }
 
@@ -186,6 +201,33 @@ const CreateDrive = () => {
                       className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                     />
                     <span className="ml-3 text-slate-700 font-medium">{course}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Eligible Passout Years */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-3">
+                Eligible Passout Years
+              </label>
+              <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
+                {PASSOUT_YEARS.map((year) => (
+                  <label
+                    key={year}
+                    className={`cursor-pointer px-3 py-2 rounded-lg border-2 text-center transition font-medium ${
+                      formData.eligiblePassoutYears.includes(year)
+                        ? "border-blue-500 bg-blue-50 text-blue-700"
+                        : "border-gray-300 hover:border-gray-400 text-gray-700"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      className="sr-only"
+                      checked={formData.eligiblePassoutYears.includes(year)}
+                      onChange={() => handlePassoutYearToggle(year)}
+                    />
+                    {year}
                   </label>
                 ))}
               </div>

@@ -25,6 +25,7 @@ router.post('/register', async (req, res) => {
       specialization,
       branch,
       year,
+      passoutYear,
     } = req.body;
 
     // Validation
@@ -39,7 +40,8 @@ router.post('/register', async (req, res) => {
       !collegeName ||
       !specialization ||
       !branch ||
-      !year
+      !year ||
+      !passoutYear
     ) {
       return res.status(400).json({ message: 'All fields are required' });
     }
@@ -69,6 +71,7 @@ router.post('/register', async (req, res) => {
       specialization,
       branch,
       year,
+      passoutYear,
     });
 
     await user.save();
@@ -128,6 +131,7 @@ router.post('/login', async (req, res) => {
         specialization: user.specialization,
         branch: user.branch,
         year: user.year,
+        passoutYear: user.passoutYear,
       },
     });
   } catch (error) {
