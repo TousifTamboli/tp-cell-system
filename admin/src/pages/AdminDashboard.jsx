@@ -23,7 +23,7 @@ const AdminDashboard = () => {
           {
             method: "GET",
             headers: {
-              "Authorization": `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
           }
@@ -63,11 +63,13 @@ const AdminDashboard = () => {
     try {
       const token = localStorage.getItem("adminToken");
       const res = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/placement/admin/delete-drive/${driveId}`,
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/placement/admin/delete-drive/${driveId}`,
         {
           method: "DELETE",
           headers: {
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -128,6 +130,12 @@ const AdminDashboard = () => {
             className="px-6 py-2 rounded-lg font-semibold transition bg-green-600 text-white hover:bg-green-700"
           >
             ➕ Create New Drive
+          </button>
+          <button
+            onClick={() => navigate("/admin/overview")}
+            className="px-6 py-2 rounded-lg font-semibold transition bg-purple-600 text-white hover:bg-purple-700"
+          >
+            📊 Student Overview
           </button>
         </div>
 
@@ -212,7 +220,9 @@ const AdminDashboard = () => {
 
                 <div className="flex gap-2">
                   <button
-                    onClick={() => navigate(`/admin/drive-details/${drive._id}`)}
+                    onClick={() =>
+                      navigate(`/admin/drive-details/${drive._id}`)
+                    }
                     className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition font-semibold"
                   >
                     View Details

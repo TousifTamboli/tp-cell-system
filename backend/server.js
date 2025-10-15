@@ -7,6 +7,7 @@ const cors = require('cors');
 const authRoutes = require('./routes/auth');
 const placementRoutes = require('./routes/placement');
 const { router: adminAuthRoutes } = require('./routes/adminAuth');
+const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 
@@ -27,6 +28,7 @@ mongoose
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/admin/auth', adminAuthRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api/placement', placementRoutes);
 
 // Basic health check

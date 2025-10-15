@@ -8,12 +8,15 @@ export const SPECIALIZATIONS = [
 ];
 
 export const BRANCHES = [
-  "DS",
-  "AIML",
   "CSE",
   "IT",
+  "AI",
+  "AIML",
+  "DS",
+  "Cyber Security",
   "Mechanical",
   "Electrical",
+  "ENTC",
   "Civil"
 ];
 
@@ -37,5 +40,8 @@ export const PASSOUT_YEARS = [
 ];
 
 export const COLLEGES = [
-  "GHRCEM"
+  "GHRCEM PUNE",
+  "GHRCACS PUNE",
+  "GHRISTU PUNE",
+  "GHRUA"
 ];
