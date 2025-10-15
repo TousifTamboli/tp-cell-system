@@ -34,6 +34,8 @@ const placementDriveSchema = new mongoose.Schema({
       },
       userName: String,
       userEmail: String,
+      userRegNo: String,       // ✅ Add this
+      userMobile: String,      // ✅ Add this
       userSpecialization: String,
       userBranch: String,
       userYear: String,

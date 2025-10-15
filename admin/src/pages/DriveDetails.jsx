@@ -301,40 +301,40 @@ const DriveDetails = () => {
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           {filteredRegistrations.length > 0 ? (
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full min-w-max">
                 <thead className="bg-slate-800 text-white">
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold">
-                      Sr No
+                    <th className="px-4 py-3 text-left text-xs font-semibold whitespace-nowrap">
+                      Sr
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold">
-                      Student Name
+                    <th className="px-4 py-3 text-left text-xs font-semibold whitespace-nowrap">
+                      Name
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold">
+                    <th className="px-4 py-3 text-left text-xs font-semibold whitespace-nowrap">
                       Email
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold">
-                      Reg Number
+                    <th className="px-4 py-3 text-left text-xs font-semibold whitespace-nowrap">
+                      Reg No
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold">
+                    <th className="px-4 py-3 text-left text-xs font-semibold whitespace-nowrap">
                       Mobile
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold">
-                      Specialization
+                    <th className="px-4 py-3 text-left text-xs font-semibold whitespace-nowrap">
+                      Course
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold">
+                    <th className="px-4 py-3 text-left text-xs font-semibold whitespace-nowrap">
                       Branch
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold">
+                    <th className="px-4 py-3 text-left text-xs font-semibold whitespace-nowrap">
                       Year
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold">
-                      Passout Year
+                    <th className="px-4 py-3 text-left text-xs font-semibold whitespace-nowrap">
+                      Passout
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold">
+                    <th className="px-4 py-3 text-left text-xs font-semibold whitespace-nowrap">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold">
+                    <th className="px-4 py-3 text-left text-xs font-semibold whitespace-nowrap">
                       Date & Time
                     </th>
                   </tr>
@@ -342,39 +342,50 @@ const DriveDetails = () => {
                 <tbody className="divide-y divide-gray-200">
                   {filteredRegistrations.map((reg, index) => (
                     <tr key={reg._id} className="hover:bg-gray-50 transition">
-                      <td className="px-6 py-4 text-sm text-slate-800">
+                      <td className="px-4 py-3 text-xs text-slate-800 whitespace-nowrap">
                         {index + 1}
                       </td>
-                      <td className="px-6 py-4 text-sm font-medium text-slate-800">
+                      <td className="px-4 py-3 text-xs font-medium text-slate-800 whitespace-nowrap">
                         {reg.userName}
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-700">
+                      <td className="px-4 py-3 text-xs text-slate-700 whitespace-nowrap">
                         {reg.userEmail}
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-700">
+                      <td className="px-4 py-3 text-xs text-slate-700 whitespace-nowrap">
+                        {reg.userRegNo || 'N/A'}
+                      </td>
+                      <td className="px-4 py-3 text-xs text-slate-700 whitespace-nowrap">
+                        {reg.userMobile || 'N/A'}
+                      </td>
+                      <td className="px-4 py-3 text-xs text-slate-700 whitespace-nowrap">
                         {reg.userSpecialization}
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-700">
+                      <td className="px-4 py-3 text-xs text-slate-700 whitespace-nowrap">
                         {reg.userBranch}
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-700">
+                      <td className="px-4 py-3 text-xs text-slate-700 whitespace-nowrap">
                         {reg.userYear}
                       </td>
-                      <td className="px-6 py-4 text-sm">
+                      <td className="px-4 py-3 text-xs text-slate-700 whitespace-nowrap">
+                        {reg.userPassoutYear || 'N/A'}
+                      </td>
+                      <td className="px-4 py-3 text-xs whitespace-nowrap">
                         <span
-                          className={`px-3 py-1 rounded-full font-semibold text-xs ${getStatusColor(
+                          className={`px-2 py-1 rounded-full font-semibold text-xs ${getStatusColor(
                             reg.status
                           )}`}
                         >
                           {reg.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-700">
-                        {new Date(reg.timestamp).toLocaleDateString()} at{" "}
-                        {new Date(reg.timestamp).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
+                      <td className="px-4 py-3 text-xs text-slate-700 whitespace-nowrap">
+                        <div>{new Date(reg.timestamp).toLocaleDateString()}</div>
+                        <div className="text-gray-500">
+                          {new Date(reg.timestamp).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </div>
                       </td>
                     </tr>
                   ))}
