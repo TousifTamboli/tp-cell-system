@@ -8,17 +8,19 @@ import AdminOverview from "./pages/AdminOverview";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/create-drive" element={<CreateDrive />} />
-        <Route path="/admin/drive-details/:driveId" element={<DriveDetails />} />
-        <Route path="/admin/edit-drive/:driveId" element={<EditDrive />} />
-        <Route path="/admin/overview" element={<AdminOverview />} />
-        <Route path="/" element={<AdminLogin />} />
-      </Routes>
-    </Router>
+    <div className="dark">
+      <Router>
+        <Routes>
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/create-drive" element={<CreateDrive />} />
+          <Route path="/admin/drive-details/:driveId" element={<DriveDetails />} />
+          <Route path="/admin/edit-drive/:driveId" element={<EditDrive />} />
+          <Route path="/admin/overview" element={<AdminOverview />} />
+          <Route path="/" element={<AdminLogin />} />
+        </Routes>
+      </Router>
+    </div>
   );
 }
 

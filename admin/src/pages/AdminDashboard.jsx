@@ -1,5 +1,30 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  Building2,
+  Calendar,
+  Clock,
+  Users,
+  LogOut,
+  Plus,
+  BarChart3,
+  Edit,
+  Trash2,
+  Eye,
+  Loader2,
+  AlertCircle,
+  Shield,
+  CheckCircle,
+  XCircle,
+  Archive,
+  Briefcase
+} from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -23,16 +48,13 @@ const AdminDashboard = () => {
           return;
         }
 
-        const res = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/placement/admin/all-drives`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const res = await fetch("http://localhost:5000/api/placement/admin/all-drives", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
 
         if (res.ok) {
           const data = await res.json();
@@ -67,251 +89,309 @@ const AdminDashboard = () => {
 
     try {
       const token = localStorage.getItem("adminToken");
-      const res = await fetch(
-        `${
-          import.meta.env.VITE_API_BASE_URL
-        }/placement/admin/delete-drive/${driveId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await fetch(`http://localhost:5000/api/placement/admin/delete-drive/${driveId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (res.ok) {
         setAllDrives(allDrives.filter((d) => d._id !== driveId));
-        alert("Drive deleted successfully");
+        // You could add a toast notification here instead of alert
       } else {
-        alert("Failed to delete drive");
+        setError("Failed to delete drive");
       }
     } catch (err) {
-      alert("Error deleting drive");
+      setError("Error deleting drive");
     }
   };
 
   // Separate drives into current and past
   const currentDrives = allDrives.filter(drive => !isDeadlinePassed(drive.deadline));
   const pastDrives = allDrives.filter(drive => isDeadlinePassed(drive.deadline));
-  
+
   const drives = activeTab === "current" ? currentDrives : pastDrives;
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-600">Loading...</p>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex items-center space-x-2">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <p className="text-muted-foreground">Loading admin dashboard...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Top Navbar */}
-      <nav className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-slate-800">T&P Cell Admin</h1>
-          <button
+      <nav className="bg-card border-b border-border shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+              <Shield className="w-6 h-6 text-primary-foreground" />
+            </div>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground">T&P Cell Admin</h1>
+              <p className="text-sm text-muted-foreground">Training & Placement Management</p>
+            </div>
+          </div>
+          <Button
             onClick={handleLogout}
-            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition"
+            variant="destructive"
+            className="self-start sm:self-center"
           >
+            <LogOut className="mr-2 h-4 w-4" />
             Logout
-          </button>
+          </Button>
         </div>
       </nav>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto p-6">
-        {/* Tabs */}
-        <div className="flex gap-4 mb-6 flex-wrap">
-          <button
+      <div className="max-w-7xl mx-auto p-4 sm:p-6">
+        {/* Action Buttons */}
+        <div className="flex flex-wrap gap-3 mb-6">
+          <Button
+            variant={activeTab === "current" ? "default" : "outline"}
             onClick={() => setActiveTab("current")}
-            className={`px-6 py-2 rounded-lg font-semibold transition ${
-              activeTab === "current"
-                ? "bg-blue-600 text-white"
-                : "bg-white text-slate-700 border border-gray-300"
-            }`}
+            className="flex-1 sm:flex-none"
           >
-            📋 Current Drives ({currentDrives.length})
-          </button>
-          
-          <button
-            onClick={() => setActiveTab("past")}
-            className={`px-6 py-2 rounded-lg font-semibold transition ${
-              activeTab === "past"
-                ? "bg-gray-600 text-white"
-                : "bg-white text-slate-700 border border-gray-300"
-            }`}
-          >
-            📂 Past Drives ({pastDrives.length})
-          </button>
+            <Briefcase className="mr-2 h-4 w-4" />
+            Current Drives
+            <Badge variant="secondary" className="ml-2">
+              {currentDrives.length}
+            </Badge>
+          </Button>
 
-          <button
+          <Button
+            variant={activeTab === "past" ? "default" : "outline"}
+            onClick={() => setActiveTab("past")}
+            className="flex-1 sm:flex-none"
+          >
+            <Archive className="mr-2 h-4 w-4" />
+            Past Drives
+            <Badge variant="secondary" className="ml-2">
+              {pastDrives.length}
+            </Badge>
+          </Button>
+
+          <Button
             onClick={() => navigate("/admin/create-drive")}
-            className="px-6 py-2 rounded-lg font-semibold transition bg-green-600 text-white hover:bg-green-700"
+            className="flex-1 sm:flex-none"
           >
-            ➕ Create New Drive
-          </button>
-          
-          <button
+            <Plus className="mr-2 h-4 w-4" />
+            Create Drive
+          </Button>
+
+          <Button
+            variant="outline"
             onClick={() => navigate("/admin/overview")}
-            className="px-6 py-2 rounded-lg font-semibold transition bg-purple-600 text-white hover:bg-purple-700"
+            className="flex-1 sm:flex-none"
           >
-            📊 Student Overview
-          </button>
+            <BarChart3 className="mr-2 h-4 w-4" />
+            Overview
+          </Button>
         </div>
 
         {error && (
-          <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-            {error}
-          </div>
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         )}
 
         {/* Tab Header */}
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">
+          <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
             {activeTab === "current" ? "Active Placement Drives" : "Past Placement Drives"}
           </h2>
-          <p className="text-gray-600 mt-1">
-            {activeTab === "current" 
-              ? "Manage currently active placement drives" 
+          <p className="text-muted-foreground">
+            {activeTab === "current"
+              ? "Manage currently active placement drives"
               : "View completed and expired placement drives"}
           </p>
         </div>
 
         {/* Drives List */}
         {drives && drives.length > 0 ? (
-          <div className="space-y-4">
+          <div className="space-y-4 sm:space-y-6">
             {drives.map((drive) => {
               const isPast = isDeadlinePassed(drive.deadline);
-              
+              const daysSinceExpiry = isPast ? Math.floor((new Date() - new Date(drive.deadline)) / (1000 * 60 * 60 * 24)) : 0;
+
               return (
-                <div
-                  key={drive._id}
-                  className={`bg-white border rounded-lg p-6 hover:shadow-md transition ${
-                    isPast ? 'border-gray-300 opacity-90' : 'border-gray-200'
-                  }`}
-                >
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <div className="flex items-center gap-3">
-                        <h2 className="text-xl font-bold text-slate-800">
-                          {drive.companyName}
-                        </h2>
-                        {isPast && (
-                          <span className="px-2 py-1 bg-gray-300 text-gray-700 text-xs font-semibold rounded">
-                            EXPIRED
-                          </span>
-                        )}
+                <Card key={drive._id} className={`hover:shadow-lg transition-shadow ${isPast ? 'opacity-90' : ''}`}>
+                  <CardHeader>
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                      <div className="flex items-start space-x-4">
+                        <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <Building2 className="w-6 h-6 text-primary" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
+                            <CardTitle className="text-xl sm:text-2xl">{drive.companyName}</CardTitle>
+                            {isPast && (
+                              <Badge variant="secondary">
+                                <XCircle className="w-3 h-3 mr-1" />
+                                Expired
+                              </Badge>
+                            )}
+                          </div>
+                          <CardDescription className="flex items-center">
+                            <Calendar className="w-4 h-4 mr-1" />
+                            Created: {new Date(drive.createdAt).toLocaleDateString()}
+                          </CardDescription>
+                        </div>
                       </div>
-                      <p className="text-sm text-gray-600 mt-1">
-                        Created: {new Date(drive.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                        drive.isActive
-                          ? "bg-green-100 text-green-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {drive.isActive ? "Active" : "Inactive"}
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div className={`p-3 rounded ${isPast ? 'bg-gray-50' : 'bg-gray-50'}`}>
-                      <p className="text-xs text-gray-600 font-semibold mb-1">
-                        Deadline
-                      </p>
-                      <p className={`text-sm font-semibold ${isPast ? 'text-red-600' : 'text-slate-800'}`}>
-                        {new Date(drive.deadline).toLocaleDateString()}
-                        {isPast && (
-                          <span className="block text-xs text-red-500 mt-1">
-                            Expired {Math.floor((new Date() - new Date(drive.deadline)) / (1000 * 60 * 60 * 24))} days ago
-                          </span>
+                      <Badge variant={drive.isActive ? "default" : "secondary"}>
+                        {drive.isActive ? (
+                          <>
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            Active
+                          </>
+                        ) : (
+                          <>
+                            <XCircle className="w-3 h-3 mr-1" />
+                            Inactive
+                          </>
                         )}
-                      </p>
+                      </Badge>
                     </div>
+                  </CardHeader>
 
-                    <div className="bg-gray-50 p-3 rounded">
-                      <p className="text-xs text-gray-600 font-semibold mb-1">
-                        Eligible Courses
-                      </p>
-                      <p className="text-sm text-slate-800">
-                        {drive.eligibleCourses.join(", ")}
-                      </p>
-                    </div>
+                  <CardContent>
+                    <div className="space-y-6">
+                      {/* Drive Stats */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <Card className={`${isPast ? 'bg-muted/50' : 'bg-muted/50'}`}>
+                          <CardContent className="p-4">
+                            <div className="flex items-center space-x-2 mb-2">
+                              <Clock className="w-4 h-4 text-muted-foreground" />
+                              <p className="text-sm font-medium text-muted-foreground">Deadline</p>
+                            </div>
+                            <p className={`font-semibold ${isPast ? 'text-destructive' : 'text-foreground'}`}>
+                              {new Date(drive.deadline).toLocaleDateString()}
+                            </p>
+                            {isPast && (
+                              <p className="text-xs text-destructive mt-1">
+                                Expired {daysSinceExpiry} days ago
+                              </p>
+                            )}
+                          </CardContent>
+                        </Card>
 
-                    <div className="bg-blue-50 p-3 rounded">
-                      <p className="text-xs text-gray-600 font-semibold mb-1">
-                        Total Registrations
-                      </p>
-                      <p className="text-sm font-bold text-blue-600">
-                        {drive.registrations.length} students
-                      </p>
-                    </div>
-                  </div>
+                        <Card className="bg-muted/50">
+                          <CardContent className="p-4">
+                            <div className="flex items-center space-x-2 mb-2">
+                              <Users className="w-4 h-4 text-muted-foreground" />
+                              <p className="text-sm font-medium text-muted-foreground">Eligible Courses</p>
+                            </div>
+                            <p className="font-semibold truncate">
+                              {drive.eligibleCourses.join(", ")}
+                            </p>
+                          </CardContent>
+                        </Card>
 
-                  <div className="mb-4">
-                    <p className="text-xs text-gray-600 font-semibold mb-2">
-                      Process Stages:
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {drive.statuses.map((status, idx) => (
-                        <span
-                          key={idx}
-                          className="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full"
+                        <Card className="bg-primary/5 border-primary/20 sm:col-span-2 lg:col-span-1">
+                          <CardContent className="p-4">
+                            <div className="flex items-center space-x-2 mb-2">
+                              <Users className="w-4 h-4 text-primary" />
+                              <p className="text-sm font-medium text-muted-foreground">Registrations</p>
+                            </div>
+                            <p className="font-bold text-primary text-lg">
+                              {drive.registrations.length} students
+                            </p>
+                          </CardContent>
+                        </Card>
+                      </div>
+
+                      {/* Process Stages */}
+                      <div>
+                        <div className="flex items-center space-x-2 mb-3">
+                          <CheckCircle className="w-4 h-4 text-primary" />
+                          <h3 className="font-semibold text-foreground">Process Stages</h3>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {drive.statuses.map((status, idx) => (
+                            <Badge key={idx} variant="outline" className="text-xs">
+                              {status}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+
+                      <Separator />
+
+                      {/* Action Buttons */}
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <Button
+                          onClick={() => navigate(`/admin/drive-details/${drive._id}`)}
+                          className="flex-1"
                         >
-                          {status}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
+                          <Eye className="mr-2 h-4 w-4" />
+                          View Details
+                        </Button>
 
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() =>
-                        navigate(`/admin/drive-details/${drive._id}`)
-                      }
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition font-semibold"
-                    >
-                      View Details
-                    </button>
-                    
-                    <button
-                      onClick={() => navigate(`/admin/edit-drive/${drive._id}`)}
-                      className="flex-1 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg transition font-semibold"
-                    >
-                      Edit
-                    </button>
-                    
-                    <button
-                      onClick={() => handleDeleteDrive(drive._id)}
-                      className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition font-semibold"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
+                        <Button
+                          variant="outline"
+                          onClick={() => navigate(`/admin/edit-drive/${drive._id}`)}
+                          className="flex-1"
+                        >
+                          <Edit className="mr-2 h-4 w-4" />
+                          Edit
+                        </Button>
+
+                        <Button
+                          variant="destructive"
+                          onClick={() => handleDeleteDrive(drive._id)}
+                          className="flex-1"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Delete
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               );
             })}
           </div>
         ) : (
-          <div className="text-center py-12 bg-white rounded-lg shadow">
-            <p className="text-gray-600 text-lg mb-4">
-              {activeTab === "current" 
-                ? "No current placement drives available" 
-                : "No past placement drives found"}
-            </p>
-            {activeTab === "current" && (
-              <button
-                onClick={() => navigate("/admin/create-drive")}
-                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg"
-              >
-                Create First Drive
-              </button>
-            )}
-          </div>
+          <Card className="text-center py-12">
+            <CardContent>
+              <div className="flex flex-col items-center space-y-4">
+                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center">
+                  {activeTab === "current" ? (
+                    <Briefcase className="w-8 h-8 text-muted-foreground" />
+                  ) : (
+                    <Archive className="w-8 h-8 text-muted-foreground" />
+                  )}
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">
+                    {activeTab === "current"
+                      ? "No Current Drives"
+                      : "No Past Drives"}
+                  </h3>
+                  <p className="text-muted-foreground mb-4">
+                    {activeTab === "current"
+                      ? "No current placement drives available"
+                      : "No past placement drives found"}
+                  </p>
+                  {activeTab === "current" && (
+                    <Button
+                      onClick={() => navigate("/admin/create-drive")}
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Create First Drive
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         )}
       </div>
     </div>

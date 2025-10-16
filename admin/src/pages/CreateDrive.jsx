@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ArrowLeft, Plus, X, Loader2, AlertCircle } from "lucide-react";
 import { SPECIALIZATIONS, PASSOUT_YEARS } from "../config/constants";
 
 const CreateDrive = () => {
@@ -100,17 +101,14 @@ const CreateDrive = () => {
     try {
       const token = localStorage.getItem("adminToken");
 
-      const res = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/placement/create-drive`,
-        {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const res = await fetch("http://localhost:5000/api/placement/create-drive", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
       const data = await res.json();
 
@@ -129,32 +127,36 @@ const CreateDrive = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Navbar */}
-      <nav className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center gap-4">
+      <nav className="bg-card shadow-sm border-b border-border">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center gap-4">
           <button
             onClick={() => navigate("/admin/dashboard")}
-            className="text-gray-600 hover:text-gray-900 text-lg"
+            className="text-muted-foreground hover:text-foreground text-lg flex items-center"
           >
-            ←
+            <ArrowLeft className="h-5 w-5" />
           </button>
-          <h1 className="text-2xl font-bold text-slate-800">Create New Drive</h1>
+          <h1 className="text-2xl font-bold text-foreground">Create New Drive</h1>
         </div>
       </nav>
 
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="bg-white rounded-lg shadow-md p-8">
+      <div className="max-w-4xl mx-auto p-4 sm:p-6">
+        <div className="bg-card rounded-lg shadow-lg border border-border p-6 sm:p-8">
           {error && (
-            <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-              {error}
+            <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 text-destructive rounded-lg flex items-start space-x-3">
+              <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-medium">Error</p>
+                <p className="text-sm mt-1">{error}</p>
+              </div>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Company Name */}
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
+              <label className="block text-sm font-semibold text-foreground mb-2">
                 Company Name
               </label>
               <input
@@ -163,14 +165,14 @@ const CreateDrive = () => {
                 value={formData.companyName}
                 onChange={handleChange}
                 placeholder="e.g., Google, Microsoft, Amazon"
-                className="w-full border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                className="w-full bg-background border border-border rounded-lg px-4 py-2 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
                 required
               />
             </div>
 
             {/* Deadline */}
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
+              <label className="block text-sm font-semibold text-foreground mb-2">
                 Registration Deadline
               </label>
               <input
@@ -178,29 +180,29 @@ const CreateDrive = () => {
                 name="deadline"
                 value={formData.deadline}
                 onChange={handleChange}
-                className="w-full border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                className="w-full bg-background border border-border rounded-lg px-4 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
                 required
               />
             </div>
 
             {/* Eligible Courses */}
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-3">
+              <label className="block text-sm font-semibold text-foreground mb-3">
                 Eligible Courses
               </label>
               <div className="space-y-2">
                 {SPECIALIZATIONS.map((course) => (
                   <label
                     key={course}
-                    className="flex items-center p-3 border border-slate-300 rounded-lg cursor-pointer hover:bg-gray-50 transition"
+                    className="flex items-center p-3 border border-border rounded-lg cursor-pointer hover:bg-muted/50 transition"
                   >
                     <input
                       type="checkbox"
                       checked={formData.eligibleCourses.includes(course)}
                       onChange={() => handleCourseToggle(course)}
-                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                      className="w-4 h-4 text-primary rounded focus:ring-primary"
                     />
-                    <span className="ml-3 text-slate-700 font-medium">{course}</span>
+                    <span className="ml-3 text-foreground font-medium">{course}</span>
                   </label>
                 ))}
               </div>
@@ -208,18 +210,17 @@ const CreateDrive = () => {
 
             {/* Eligible Passout Years */}
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-3">
+              <label className="block text-sm font-semibold text-foreground mb-3">
                 Eligible Passout Years
               </label>
               <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
                 {PASSOUT_YEARS.map((year) => (
                   <label
                     key={year}
-                    className={`cursor-pointer px-3 py-2 rounded-lg border-2 text-center transition font-medium ${
-                      formData.eligiblePassoutYears.includes(year)
-                        ? "border-blue-500 bg-blue-50 text-blue-700"
-                        : "border-gray-300 hover:border-gray-400 text-gray-700"
-                    }`}
+                    className={`cursor-pointer px-3 py-2 rounded-lg border-2 text-center transition font-medium ${formData.eligiblePassoutYears.includes(year)
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border hover:border-primary/50 text-foreground hover:bg-muted/50"
+                      }`}
                   >
                     <input
                       type="checkbox"
@@ -235,7 +236,7 @@ const CreateDrive = () => {
 
             {/* Process Stages/Statuses */}
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-3">
+              <label className="block text-sm font-semibold text-foreground mb-3">
                 Process Stages (Status Options for Students)
               </label>
               <div className="flex gap-2 mb-3">
@@ -243,15 +244,16 @@ const CreateDrive = () => {
                   type="text"
                   value={statusInput}
                   onChange={(e) => setStatusInput(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && addStatus()}
+                  onKeyDown={(e) => e.key === "Enter" && addStatus()}
                   placeholder="e.g., Registration Done, Test Given, Interview"
-                  className="flex-1 border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  className="flex-1 bg-background border border-border rounded-lg px-4 py-2 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
                 />
                 <button
                   type="button"
                   onClick={addStatus}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 rounded-lg font-semibold transition flex items-center"
                 >
+                  <Plus className="w-4 h-4 mr-2" />
                   Add
                 </button>
               </div>
@@ -262,20 +264,20 @@ const CreateDrive = () => {
                   formData.statuses.map((status, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between bg-blue-50 p-3 rounded-lg border border-blue-200"
+                      className="flex items-center justify-between bg-primary/10 p-3 rounded-lg border border-primary/20"
                     >
-                      <span className="text-slate-800 font-medium">{status}</span>
+                      <span className="text-foreground font-medium">{status}</span>
                       <button
                         type="button"
                         onClick={() => removeStatus(index)}
-                        className="text-red-600 hover:text-red-800 font-bold"
+                        className="text-destructive hover:text-destructive/80 font-bold flex items-center"
                       >
-                        ✕
+                        <X className="w-4 h-4" />
                       </button>
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-500 text-sm italic">
+                  <p className="text-muted-foreground text-sm italic">
                     No stages added yet
                   </p>
                 )}
@@ -283,24 +285,33 @@ const CreateDrive = () => {
             </div>
 
             {/* Buttons */}
-            <div className="flex gap-4 pt-6 border-t border-slate-200">
+            <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-border">
               <button
                 type="button"
                 onClick={() => navigate("/admin/dashboard")}
-                className="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg font-semibold transition"
+                className="flex-1 bg-secondary hover:bg-secondary/80 text-secondary-foreground px-6 py-2 rounded-lg font-semibold transition"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className={`flex-1 text-white px-6 py-2 rounded-lg font-semibold transition ${
-                  loading
-                    ? "bg-slate-400 cursor-not-allowed"
-                    : "bg-green-600 hover:bg-green-700"
-                }`}
+                className={`flex-1 px-6 py-2 rounded-lg font-semibold transition flex items-center justify-center ${loading
+                  ? "bg-muted text-muted-foreground cursor-not-allowed"
+                  : "bg-primary hover:bg-primary/90 text-primary-foreground"
+                  }`}
               >
-                {loading ? "Creating..." : "Create Drive"}
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Drive
+                  </>
+                )}
               </button>
             </div>
           </form>
