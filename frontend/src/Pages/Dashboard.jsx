@@ -4,11 +4,16 @@ import { useNavigate } from "react-router-dom";
 const Dashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [drives, setDrives] = useState([]);
+  const [currentDrives, setCurrentDrives] = useState([]);
+  const [pastDrives, setPastDrives] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("current");
-  const [selectedStatuses, setSelectedStatuses] = useState({}); // Track selected statuses
+
+  // Helper function to check if deadline has passed
+  const isDeadlinePassed = (deadline) => {
+    return new Date(deadline) < new Date();
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,7 +28,7 @@ const Dashboard = () => {
 
         setUser(JSON.parse(storedUser));
 
-        // Fetch current placement drives for user's specialization
+        // Fetch all drives for user's specialization
         const res = await fetch(
           `${import.meta.env.VITE_API_BASE_URL}/placement/get-drives`,
           {
@@ -37,7 +42,13 @@ const Dashboard = () => {
 
         if (res.ok) {
           const data = await res.json();
-          setDrives(data);
+          
+          // Separate drives into current and past based on deadline
+          const current = data.filter(drive => !isDeadlinePassed(drive.deadline));
+          const past = data.filter(drive => isDeadlinePassed(drive.deadline));
+          
+          setCurrentDrives(current);
+          setPastDrives(past);
           setError("");
         } else if (res.status === 401) {
           localStorage.removeItem("token");
@@ -63,7 +74,13 @@ const Dashboard = () => {
     navigate("/login");
   };
 
-  const handleStatusUpdate = async (driveId, status) => {
+  const handleStatusUpdate = async (driveId, status, deadline) => {
+    // Check if deadline has passed
+    if (isDeadlinePassed(deadline)) {
+      alert("This drive has ended. You cannot update your status.");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
       const res = await fetch(
@@ -84,10 +101,10 @@ const Dashboard = () => {
 
       if (res.ok) {
         alert("Status updated successfully!");
-        // Refresh drives
         window.location.reload();
       } else {
-        alert("Failed to update status");
+        const errorData = await res.json();
+        alert(errorData.message || "Failed to update status");
       }
     } catch (err) {
       console.error(err);
@@ -126,7 +143,7 @@ const Dashboard = () => {
                 : "text-gray-300 hover:bg-gray-700"
             }`}
           >
-            📋 Current Drives
+            📋 Current Drives ({currentDrives.length})
           </button>
 
           <button
@@ -137,7 +154,7 @@ const Dashboard = () => {
                 : "text-gray-300 hover:bg-gray-700"
             }`}
           >
-            📂 Past Drives
+            📂 Past Drives ({pastDrives.length})
           </button>
 
           <button
@@ -179,9 +196,9 @@ const Dashboard = () => {
         {/* Current Drives Tab */}
         {activeTab === "current" && (
           <div>
-            {drives && drives.length > 0 ? (
+            {currentDrives && currentDrives.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {drives.map((drive) => (
+                {currentDrives.map((drive) => (
                   <div
                     key={drive._id}
                     className="bg-white shadow-md rounded-lg p-6 border-l-4 border-blue-600 hover:shadow-lg transition"
@@ -199,7 +216,7 @@ const Dashboard = () => {
                           {drive.statuses.map((status, idx) => (
                             <button
                               key={idx}
-                              onClick={() => handleStatusUpdate(drive._id, status)}
+                              onClick={() => handleStatusUpdate(drive._id, status, drive.deadline)}
                               className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition"
                             >
                               {status}
@@ -234,17 +251,62 @@ const Dashboard = () => {
         {/* Past Drives Tab */}
         {activeTab === "past" && (
           <div>
-            <div className="text-center py-12 bg-white rounded-lg shadow">
-              <p className="text-gray-600 text-lg mb-4">
-                View your past placement drive participation
-              </p>
-              <button
-                onClick={() => navigate("/past-drives")}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition"
-              >
-                View Detailed History
-              </button>
-            </div>
+            {pastDrives && pastDrives.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {pastDrives.map((drive) => {
+                  // Find user's registration status for this drive
+                  const userRegistration = drive.registrations?.find(
+                    reg => reg.userId.toString() === user.id
+                  );
+
+                  return (
+                    <div
+                      key={drive._id}
+                      className="bg-gray-50 shadow-md rounded-lg p-6 border-l-4 border-gray-400 opacity-90"
+                    >
+                      <div className="flex justify-between items-start mb-3">
+                        <h3 className="text-xl font-bold text-gray-700">
+                          {drive.companyName}
+                        </h3>
+                        <span className="px-2 py-1 bg-gray-300 text-gray-700 text-xs font-semibold rounded">
+                          ENDED
+                        </span>
+                      </div>
+
+                      {userRegistration && (
+                        <div className="mb-4 p-3 bg-white rounded border border-gray-200">
+                          <p className="text-sm text-gray-600 mb-1">Your Status:</p>
+                          <p className="font-semibold text-gray-800">{userRegistration.status}</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Updated: {new Date(userRegistration.timestamp).toLocaleString()}
+                          </p>
+                        </div>
+                      )}
+
+                      {!userRegistration && (
+                        <div className="mb-4 p-3 bg-yellow-50 rounded border border-yellow-200">
+                          <p className="text-sm text-gray-600">You did not participate in this drive</p>
+                        </div>
+                      )}
+
+                      {drive.deadline && (
+                        <div className="pt-3 border-t border-gray-300">
+                          <p className="text-xs text-gray-500">
+                            Deadline: {new Date(drive.deadline).toLocaleDateString()}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-12 bg-white rounded-lg shadow">
+                <p className="text-gray-600 text-lg">
+                  No past placement drives found
+                </p>
+              </div>
+            )}
           </div>
         )}
       </main>

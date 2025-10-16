@@ -24,6 +24,11 @@ function authenticateToken(req, res, next) {
   });
 }
 
+// Helper function to check if deadline has passed
+function isDeadlinePassed(deadline) {
+  return new Date(deadline) < new Date();
+}
+
 // ===== ADMIN: CREATE NEW PLACEMENT DRIVE =====
 router.post("/create-drive", authenticateToken, async (req, res) => {
   try {
@@ -77,7 +82,8 @@ router.get("/get-drives", authenticateToken, async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Find active drives that include user's specialization AND passout year
+    // Find all drives that include user's specialization AND passout year
+    // Returns both current and past drives (frontend will filter by deadline)
     const drives = await PlacementDrive.find({
       eligibleCourses: user.specialization,
       eligiblePassoutYears: user.passoutYear,
@@ -115,27 +121,39 @@ router.post("/update-status", authenticateToken, async (req, res) => {
       return res.status(404).json({ message: "Drive not found" });
     }
 
-    // Check if user already registered
-    const existingReg = drive.registrations.findIndex(
-      (reg) => reg.userId.toString() === userId
+    // CRITICAL: Check if deadline has passed
+    if (isDeadlinePassed(drive.deadline)) {
+      return res.status(403).json({ 
+        message: "This drive has ended. You cannot update your status after the deadline." 
+      });
+    }
+
+    // Check if user already registered - FIXED: Compare as strings
+    const existingRegIndex = drive.registrations.findIndex(
+      (reg) => reg.userId.toString() === userId.toString()
     );
 
-    if (existingReg !== -1) {
+    if (existingRegIndex !== -1) {
       // Update existing registration
-      drive.registrations[existingReg].status = status;
-      drive.registrations[existingReg].timestamp = new Date();
+      drive.registrations[existingRegIndex].status = status;
+      drive.registrations[existingRegIndex].timestamp = new Date();
+      
+      // Optionally update other fields if user profile changed
+      drive.registrations[existingRegIndex].userName = user.name;
+      drive.registrations[existingRegIndex].userEmail = user.email;
+      drive.registrations[existingRegIndex].userMobile = user.mobile;
     } else {
       // Add new registration
       drive.registrations.push({
-        userId,
+        userId: userId,
         userName: user.name,
         userEmail: user.email,
-        userRegNo: user.regNo, // Add this
-        userMobile: user.mobile, // Add this
+        userRegNo: user.regNo,
+        userMobile: user.mobile,
         userSpecialization: user.specialization,
         userBranch: user.branch,
         userYear: user.year,
-        userPassoutYear: user.passoutYear, // Add this
+        userPassoutYear: user.passoutYear,
         status,
         timestamp: new Date(),
       });
@@ -160,7 +178,13 @@ router.get("/admin/all-drives", authenticateToken, async (req, res) => {
   try {
     const drives = await PlacementDrive.find().sort({ createdAt: -1 });
 
-    res.status(200).json(drives);
+    // Add isPast flag to each drive
+    const drivesWithStatus = drives.map(drive => ({
+      ...drive.toObject(),
+      isPast: isDeadlinePassed(drive.deadline)
+    }));
+
+    res.status(200).json(drivesWithStatus);
   } catch (error) {
     console.error(error);
     res
@@ -181,7 +205,13 @@ router.get("/admin/drive/:driveId", authenticateToken, async (req, res) => {
       return res.status(404).json({ message: "Drive not found" });
     }
 
-    res.status(200).json(drive);
+    // Add isPast flag
+    const driveWithStatus = {
+      ...drive.toObject(),
+      isPast: isDeadlinePassed(drive.deadline)
+    };
+
+    res.status(200).json(driveWithStatus);
   } catch (error) {
     console.error(error);
     res
