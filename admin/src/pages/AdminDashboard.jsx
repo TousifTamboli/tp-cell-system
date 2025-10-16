@@ -278,16 +278,12 @@ const AdminDashboard = () => {
                       View Details
                     </button>
                     
-                    {!isPast && (
-                      <>
-                        <button
-                          onClick={() => navigate(`/admin/edit-drive/${drive._id}`)}
-                          className="flex-1 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg transition font-semibold"
-                        >
-                          Edit
-                        </button>
-                      </>
-                    )}
+                    <button
+                      onClick={() => navigate(`/admin/edit-drive/${drive._id}`)}
+                      className="flex-1 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg transition font-semibold"
+                    >
+                      Edit
+                    </button>
                     
                     <button
                       onClick={() => handleDeleteDrive(drive._id)}

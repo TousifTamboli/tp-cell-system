@@ -303,4 +303,51 @@ router.get("/past-drives", authenticateToken, async (req, res) => {
   }
 });
 
+// ===== ADMIN: GET STATISTICS FOR A DRIVE =====
+router.get("/admin/drive-stats/:driveId", authenticateToken, async (req, res) => {
+  try {
+    const drive = await PlacementDrive.findById(req.params.driveId);
+
+    if (!drive) {
+      return res.status(404).json({ message: "Drive not found" });
+    }
+
+    // Calculate statistics
+    const stats = {
+      totalRegistrations: drive.registrations.length,
+      statusBreakdown: {},
+      specializationBreakdown: {},
+      branchBreakdown: {},
+      yearBreakdown: {},
+      isPast: isDeadlinePassed(drive.deadline),
+      daysUntilDeadline: Math.ceil((new Date(drive.deadline) - new Date()) / (1000 * 60 * 60 * 24))
+    };
+
+    // Calculate breakdowns
+    drive.registrations.forEach(reg => {
+      // Status breakdown
+      stats.statusBreakdown[reg.status] = (stats.statusBreakdown[reg.status] || 0) + 1;
+      
+      // Specialization breakdown
+      stats.specializationBreakdown[reg.userSpecialization] = 
+        (stats.specializationBreakdown[reg.userSpecialization] || 0) + 1;
+      
+      // Branch breakdown
+      stats.branchBreakdown[reg.userBranch] = 
+        (stats.branchBreakdown[reg.userBranch] || 0) + 1;
+      
+      // Year breakdown
+      stats.yearBreakdown[reg.userYear] = 
+        (stats.yearBreakdown[reg.userYear] || 0) + 1;
+    });
+
+    res.status(200).json(stats);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Error fetching drive statistics", error: error.message });
+  }
+});
+
 module.exports = router;
