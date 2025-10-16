@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Save, X, Plus, Trash2, AlertCircle, Loader2, Building2, Calendar, Users, Settings, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, Save, X, Plus, Trash2, AlertCircle, Loader2, Building2, Calendar, Users, Settings } from "lucide-react";
 import { SPECIALIZATIONS, PASSOUT_YEARS } from "../config/constants";
 
 const EditDrive = () => {
@@ -20,27 +20,12 @@ const EditDrive = () => {
   });
 
   const [newStatus, setNewStatus] = useState("");
-  const [showCalendar, setShowCalendar] = useState(false);
-  const [calendarDate, setCalendarDate] = useState(new Date());
-  const calendarRef = useRef(null);
 
   useEffect(() => {
     fetchDriveDetails();
   }, [driveId]);
 
-  // Close calendar when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (calendarRef.current && !calendarRef.current.contains(event.target)) {
-        setShowCalendar(false);
-      }
-    };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
 
   const fetchDriveDetails = async () => {
     try {
@@ -138,53 +123,9 @@ const EditDrive = () => {
     }));
   };
 
-  // Calendar helper functions
-  const getDaysInMonth = (date) => {
-    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-  };
 
-  const getFirstDayOfMonth = (date) => {
-    return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-  };
 
-  const formatDateForInput = (date) => {
-    return date.toISOString().split('T')[0];
-  };
 
-  const handleDateSelect = (day) => {
-    const selectedDate = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), day);
-    const formattedDate = formatDateForInput(selectedDate);
-
-    setFormData(prev => ({
-      ...prev,
-      deadline: formattedDate
-    }));
-    setShowCalendar(false);
-  };
-
-  const navigateMonth = (direction) => {
-    setCalendarDate(prev => {
-      const newDate = new Date(prev);
-      newDate.setMonth(prev.getMonth() + direction);
-      return newDate;
-    });
-  };
-
-  const isDateSelected = (day) => {
-    if (!formData.deadline) return false;
-    const selectedDate = new Date(formData.deadline);
-    return selectedDate.getDate() === day &&
-      selectedDate.getMonth() === calendarDate.getMonth() &&
-      selectedDate.getFullYear() === calendarDate.getFullYear();
-  };
-
-  const isDatePast = (day) => {
-    const today = new Date();
-    const checkDate = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), day);
-    today.setHours(0, 0, 0, 0);
-    checkDate.setHours(0, 0, 0, 0);
-    return checkDate < today;
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -317,121 +258,23 @@ const EditDrive = () => {
             </div>
 
             {/* Deadline */}
-            <div className="relative">
+            <div>
               <label className="block text-sm font-semibold text-foreground mb-2 flex items-center">
                 <Calendar className="w-4 h-4 mr-2" />
                 Application Deadline *
               </label>
-
-              <div className="relative">
-                <input
-                  type="date"
-                  name="deadline"
-                  value={formData.deadline}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 bg-background border border-border rounded-lg text-foreground focus:ring-2 focus:ring-primary focus:border-primary transition pr-12"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowCalendar(!showCalendar);
-                    if (formData.deadline) {
-                      setCalendarDate(new Date(formData.deadline));
-                    }
-                  }}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition"
-                >
-                  <Calendar className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Calendar Popup */}
-              {showCalendar && (
-                <div
-                  ref={calendarRef}
-                  className="absolute top-full left-0 mt-2 bg-card border border-border rounded-lg shadow-lg z-50 p-4 w-80"
-                >
-                  {/* Calendar Header */}
-                  <div className="flex items-center justify-between mb-4">
-                    <button
-                      type="button"
-                      onClick={() => navigateMonth(-1)}
-                      className="p-1 hover:bg-muted rounded-lg transition"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                    </button>
-                    <h3 className="text-sm font-semibold text-foreground">
-                      {calendarDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                    </h3>
-                    <button
-                      type="button"
-                      onClick={() => navigateMonth(1)}
-                      className="p-1 hover:bg-muted rounded-lg transition"
-                    >
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
-
-                  {/* Calendar Grid */}
-                  <div className="grid grid-cols-7 gap-1 mb-2">
-                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                      <div key={day} className="text-xs font-medium text-muted-foreground text-center py-2">
-                        {day}
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="grid grid-cols-7 gap-1">
-                    {/* Empty cells for days before month starts */}
-                    {Array.from({ length: getFirstDayOfMonth(calendarDate) }, (_, i) => (
-                      <div key={`empty-${i}`} className="h-8"></div>
-                    ))}
-
-                    {/* Days of the month */}
-                    {Array.from({ length: getDaysInMonth(calendarDate) }, (_, i) => {
-                      const day = i + 1;
-                      const isPast = isDatePast(day);
-                      const isSelected = isDateSelected(day);
-
-                      return (
-                        <button
-                          key={day}
-                          type="button"
-                          onClick={() => !isPast && handleDateSelect(day)}
-                          disabled={isPast}
-                          className={`h-8 text-xs rounded-lg transition ${isSelected
-                              ? 'bg-primary text-primary-foreground font-semibold'
-                              : isPast
-                                ? 'text-muted-foreground/50 cursor-not-allowed'
-                                : 'text-foreground hover:bg-muted'
-                            }`}
-                        >
-                          {day}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {/* Today Button */}
-                  <div className="mt-4 pt-3 border-t border-border">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const today = new Date();
-                        const formattedToday = formatDateForInput(today);
-                        setFormData(prev => ({ ...prev, deadline: formattedToday }));
-                        setCalendarDate(today);
-                        setShowCalendar(false);
-                      }}
-                      className="w-full px-3 py-2 text-sm bg-secondary hover:bg-secondary/80 text-secondary-foreground rounded-lg transition"
-                    >
-                      Select Today
-                    </button>
-                  </div>
-                </div>
-              )}
+              <input
+                type="date"
+                name="deadline"
+                value={formData.deadline}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 bg-background border border-border rounded-lg text-foreground focus:ring-2 focus:ring-primary focus:border-primary transition"
+                required
+                min={new Date().toISOString().split('T')[0]}
+              />
             </div>
+
+
 
             {/* Eligible Courses */}
             <div>
@@ -605,8 +448,8 @@ const EditDrive = () => {
             </ul>
           </div>
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 
