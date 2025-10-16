@@ -48,7 +48,7 @@ const AdminDashboard = () => {
           return;
         }
 
-        const res = await fetch("http://localhost:5000/api/placement/admin/all-drives", {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/placement/admin/all-drives`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -89,7 +89,7 @@ const AdminDashboard = () => {
 
     try {
       const token = localStorage.getItem("adminToken");
-      const res = await fetch(`http://localhost:5000/api/placement/admin/delete-drive/${driveId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/placement/admin/delete-drive/${driveId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

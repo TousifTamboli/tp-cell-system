@@ -101,7 +101,7 @@ const CreateDrive = () => {
     try {
       const token = localStorage.getItem("adminToken");
 
-      const res = await fetch("http://localhost:5000/api/placement/create-drive", {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/placement/create-drive`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,

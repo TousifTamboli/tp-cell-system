@@ -35,7 +35,7 @@ const AdminOverview = () => {
         return;
       }
 
-      const res = await fetch("http://localhost:5000/api/admin/college-stats", {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/college-stats`, {
         headers: {
           "Authorization": `Bearer ${token}`,
         },

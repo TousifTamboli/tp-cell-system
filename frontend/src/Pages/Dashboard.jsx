@@ -52,7 +52,7 @@ const Dashboard = () => {
         setUser(JSON.parse(storedUser));
 
         // Fetch all drives for user's specialization
-        const res = await fetch("http://localhost:5000/api/placement/get-drives", {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/placement/get-drives`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -102,7 +102,7 @@ const Dashboard = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:5000/api/placement/update-status", {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/placement/update-status`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,

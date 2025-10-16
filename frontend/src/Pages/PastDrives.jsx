@@ -37,7 +37,7 @@ const PastDrives = () => {
         }
 
         // Fetch all past drives with user's participation history
-        const res = await fetch("http://localhost:5000/api/placement/past-drives", {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/placement/past-drives`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
