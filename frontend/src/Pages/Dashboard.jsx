@@ -300,61 +300,91 @@ const Dashboard = () => {
               <div>
                 {currentDrives && currentDrives.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-                    {currentDrives.map((drive) => (
-                      <Card key={drive._id} className="hover:shadow-lg transition-shadow">
-                        <CardHeader className="pb-3">
-                          <div className="flex items-start justify-between">
-                            <div className="flex items-center space-x-3 min-w-0 flex-1">
-                              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                                <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <CardTitle className="text-lg sm:text-xl truncate">{drive.companyName}</CardTitle>
-                                <Badge variant="outline" className="mt-1 text-xs">
-                                  <Clock className="w-3 h-3 mr-1" />
-                                  Active
-                                </Badge>
+                    {currentDrives.map((drive) => {
+                      // Find user's current registration/status for this drive
+                      const userRegistration = drive.registrations?.find(
+                        reg => reg.userId.toString() === user.id
+                      );
+
+                      return (
+                        <Card key={drive._id} className="hover:shadow-lg transition-shadow">
+                          <CardHeader className="pb-3">
+                            <div className="flex items-start justify-between">
+                              <div className="flex items-center space-x-3 min-w-0 flex-1">
+                                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                                  <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <CardTitle className="text-lg sm:text-xl truncate">{drive.companyName}</CardTitle>
+                                  <Badge variant="outline" className="mt-1 text-xs">
+                                    <Clock className="w-3 h-3 mr-1" />
+                                    Active
+                                  </Badge>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="space-y-4">
-                            <div>
-                              <p className="text-sm font-medium text-muted-foreground mb-2">
-                                Status Options (Click on the current status that you have acheived):
-                              </p>
-                              {drive.statuses && drive.statuses.length > 0 ? (
-                                <div className="flex flex-wrap gap-2">
-                                  {drive.statuses.map((status, idx) => (
-                                    <Button
-                                      key={idx}
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => handleStatusUpdate(drive._id, status, drive.deadline)}
-                                      className="text-xs flex-shrink-0"
-                                    >
-                                      {status}
-                                    </Button>
-                                  ))}
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-4">
+                              {/* Show current status if user has registered */}
+                              {userRegistration && (
+                                <div className="p-3 bg-green-500/10 rounded-lg border border-green-500/20 mb-4">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <p className="text-sm font-medium text-foreground">Your Current Status:</p>
+                                    <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                                  </div>
+                                  <p className="font-semibold text-green-700 dark:text-green-400 truncate">{userRegistration.status}</p>
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    Updated: {new Date(userRegistration.timestamp).toLocaleString()}
+                                  </p>
                                 </div>
-                              ) : (
-                                <p className="text-muted-foreground text-sm">No statuses available</p>
+                              )}
+
+                              <div>
+                                <p className="text-sm font-medium text-muted-foreground mb-2">
+                                  {userRegistration
+                                    ? "Update your status (Click to change to a new status):"
+                                    : "Status Options (Click on the current status that you have achieved):"}
+                                </p>
+                                {drive.statuses && drive.statuses.length > 0 ? (
+                                  <div className="flex flex-wrap gap-2">
+                                    {drive.statuses.map((status, idx) => {
+                                      const isCurrentStatus = userRegistration?.status === status;
+                                      return (
+                                        <Button
+                                          key={idx}
+                                          size="sm"
+                                          variant={isCurrentStatus ? "default" : "outline"}
+                                          onClick={() => handleStatusUpdate(drive._id, status, drive.deadline)}
+                                          className={`text-xs flex-shrink-0 ${isCurrentStatus
+                                              ? "bg-primary text-primary-foreground"
+                                              : ""
+                                            }`}
+                                        >
+                                          {isCurrentStatus && <CheckCircle className="w-3 h-3 mr-1" />}
+                                          {status}
+                                        </Button>
+                                      );
+                                    })}
+                                  </div>
+                                ) : (
+                                  <p className="text-muted-foreground text-sm">No statuses available</p>
+                                )}
+                              </div>
+
+                              {drive.deadline && (
+                                <div className="pt-3 border-t">
+                                  <div className="flex items-center text-sm text-muted-foreground">
+                                    <Calendar className="w-4 h-4 mr-2 flex-shrink-0" />
+                                    <span className="truncate">Deadline: {new Date(drive.deadline).toLocaleDateString()}</span>
+                                  </div>
+                                </div>
                               )}
                             </div>
-
-                            {drive.deadline && (
-                              <div className="pt-3 border-t">
-                                <div className="flex items-center text-sm text-muted-foreground">
-                                  <Calendar className="w-4 h-4 mr-2 flex-shrink-0" />
-                                  <span className="truncate">Deadline: {new Date(drive.deadline).toLocaleDateString()}</span>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
                   </div>
                 ) : (
                   <Card className="text-center py-8 sm:py-12">
